@@ -1,0 +1,13 @@
+{
+  "domain": "apg_powermonitor",
+  "name": "APG Powermonitor",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/OWNER/apg-powermonitor",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/OWNER/apg-powermonitor/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.1.0"
+}

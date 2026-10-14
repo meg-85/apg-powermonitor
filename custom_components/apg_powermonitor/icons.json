@@ -1,0 +1,19 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "peak_hour": {
+        "default": "mdi:transmission-tower",
+        "state": { "on": "mdi:transmission-tower-export" }
+      }
+    },
+    "sensor": {
+      "period_start": { "default": "mdi:clock-start" },
+      "period_end": { "default": "mdi:clock-end" },
+      "peak_hours_today": { "default": "mdi:chart-bell-curve" },
+      "peak_hours_tomorrow": { "default": "mdi:chart-bell-curve" }
+    },
+    "calendar": {
+      "peak_calendar": { "default": "mdi:calendar-alert" }
+    }
+  }
+}

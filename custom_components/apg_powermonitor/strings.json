@@ -1,0 +1,36 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "APG Powermonitor",
+        "description": "Fetch the forecast peak hours of the Austrian power grid from Austrian Power Grid (APG)."
+      }
+    },
+    "error": {
+      "cannot_connect": "The APG API could not be reached."
+    },
+    "abort": {
+      "single_instance_allowed": "APG Powermonitor is already configured."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "peak_hour": {
+        "name": "Peak hour",
+        "state_attributes": {
+          "period_start": { "name": "Period start" },
+          "period_end": { "name": "Period end" }
+        }
+      }
+    },
+    "sensor": {
+      "period_start": { "name": "Peak period start" },
+      "period_end": { "name": "Peak period end" },
+      "peak_hours_today": { "name": "Peak hours today" },
+      "peak_hours_tomorrow": { "name": "Peak hours tomorrow" }
+    },
+    "calendar": {
+      "peak_calendar": { "name": "Peak hours" }
+    }
+  }
+}

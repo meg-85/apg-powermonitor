@@ -1,0 +1,36 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "APG Powermonitor",
+        "description": "Prognostizierte Spitzenzeiten des österreichischen Stromnetzes von Austrian Power Grid (APG) abrufen."
+      }
+    },
+    "error": {
+      "cannot_connect": "Die APG-API ist nicht erreichbar."
+    },
+    "abort": {
+      "single_instance_allowed": "APG Powermonitor ist bereits eingerichtet."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "peak_hour": {
+        "name": "Spitzenzeit",
+        "state_attributes": {
+          "period_start": { "name": "Beginn" },
+          "period_end": { "name": "Ende" }
+        }
+      }
+    },
+    "sensor": {
+      "period_start": { "name": "Spitzenzeit Beginn" },
+      "period_end": { "name": "Spitzenzeit Ende" },
+      "peak_hours_today": { "name": "Spitzenstunden heute" },
+      "peak_hours_tomorrow": { "name": "Spitzenstunden morgen" }
+    },
+    "calendar": {
+      "peak_calendar": { "name": "Spitzenzeiten" }
+    }
+  }
+}
