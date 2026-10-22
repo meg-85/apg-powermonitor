@@ -3,17 +3,38 @@
     "binary_sensor": {
       "peak_hour": {
         "default": "mdi:transmission-tower",
-        "state": { "on": "mdi:transmission-tower-export" }
+        "state": {
+          "on": "mdi:transmission-tower-export"
+        }
       }
     },
     "sensor": {
-      "period_start": { "default": "mdi:clock-start" },
-      "period_end": { "default": "mdi:clock-end" },
-      "peak_hours_today": { "default": "mdi:chart-bell-curve" },
-      "peak_hours_tomorrow": { "default": "mdi:chart-bell-curve" }
+      "period_start": {
+        "default": "mdi:clock-start"
+      },
+      "period_end": {
+        "default": "mdi:clock-end"
+      },
+      "offpeak_start": {
+        "default": "mdi:power-plug-outline"
+      },
+      "offpeak_end": {
+        "default": "mdi:power-plug-off-outline"
+      },
+      "offpeak_duration": {
+        "default": "mdi:timer-outline"
+      },
+      "peak_hours_today": {
+        "default": "mdi:chart-bell-curve"
+      },
+      "peak_hours_tomorrow": {
+        "default": "mdi:chart-bell-curve"
+      }
     },
     "calendar": {
-      "peak_calendar": { "default": "mdi:calendar-alert" }
+      "peak_calendar": {
+        "default": "mdi:calendar-alert"
+      }
     }
   }
 }

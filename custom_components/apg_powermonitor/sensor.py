@@ -40,6 +40,22 @@ def _period_end(data: PeakHourData, now: datetime) -> datetime | None:
     return period.end if period else None
 
 
+def _window_start(data: PeakHourData, now: datetime) -> datetime | None:
+    window = data.current_or_next_window(now)
+    return window.start if window else None
+
+
+def _window_end(data: PeakHourData, now: datetime) -> datetime | None:
+    window = data.current_or_next_window(now)
+    return window.end if window else None
+
+
+def _window_hours(data: PeakHourData, now: datetime) -> float | None:
+    """Total length of the window in hours (not the remaining time)."""
+    window = data.current_or_next_window(now)
+    return window.duration.total_seconds() / 3600 if window else None
+
+
 @dataclass(frozen=True, kw_only=True)
 class ApgSensorDescription(SensorEntityDescription):
     value_fn: Callable[[PeakHourData, datetime], StateType | datetime]
@@ -55,6 +71,23 @@ SENSORS: tuple[ApgSensorDescription, ...] = (
         key="period_end",
         device_class=SensorDeviceClass.TIMESTAMP,
         value_fn=_period_end,
+    ),
+    ApgSensorDescription(
+        key="offpeak_start",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        value_fn=_window_start,
+    ),
+    ApgSensorDescription(
+        key="offpeak_end",
+        device_class=SensorDeviceClass.TIMESTAMP,
+        value_fn=_window_end,
+    ),
+    ApgSensorDescription(
+        key="offpeak_duration",
+        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        suggested_display_precision=0,
+        value_fn=_window_hours,
     ),
     ApgSensorDescription(
         key="peak_hours_today",

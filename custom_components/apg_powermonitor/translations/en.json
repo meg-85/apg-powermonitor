@@ -18,19 +18,42 @@
       "peak_hour": {
         "name": "Peak hour",
         "state_attributes": {
-          "period_start": { "name": "Period start" },
-          "period_end": { "name": "Period end" }
+          "period_start": {
+            "name": "Period start"
+          },
+          "period_end": {
+            "name": "Period end"
+          }
         }
       }
     },
     "sensor": {
-      "period_start": { "name": "Peak period start" },
-      "period_end": { "name": "Peak period end" },
-      "peak_hours_today": { "name": "Peak hours today" },
-      "peak_hours_tomorrow": { "name": "Peak hours tomorrow" }
+      "period_start": {
+        "name": "Peak period start"
+      },
+      "period_end": {
+        "name": "Peak period end"
+      },
+      "offpeak_start": {
+        "name": "Off-peak window start"
+      },
+      "offpeak_end": {
+        "name": "Off-peak window end"
+      },
+      "offpeak_duration": {
+        "name": "Off-peak window duration"
+      },
+      "peak_hours_today": {
+        "name": "Peak hours today"
+      },
+      "peak_hours_tomorrow": {
+        "name": "Peak hours tomorrow"
+      }
     },
     "calendar": {
-      "peak_calendar": { "name": "Peak hours" }
+      "peak_calendar": {
+        "name": "Peak hours"
+      }
     }
   }
 }

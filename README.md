@@ -10,6 +10,8 @@ Spitzenzeiten sind Stunden, in denen die Residuallast (Verbrauch minus Einspeisu
 |---|---|
 | Binary Sensor **Spitzenzeit** | `on`, solange die aktuelle Stunde eine Spitzenstunde ist. Attribute: Beginn/Ende des aktuellen bzw. nächsten Spitzenblocks |
 | Sensor **Spitzenzeit Beginn** / **Ende** | Zeitstempel des aktuellen bzw. nächsten Spitzenblocks |
+| Sensor **Niedriglast Beginn** / **Ende** | Laufendes bzw. nächstes Fenster ohne Spitzenzeit (nur wenn es innerhalb der nächsten 24 h beginnt, sonst `unbekannt`) |
+| Sensor **Niedriglast Dauer** | Gesamtlänge dieses Fensters in Stunden |
 | Sensor **Spitzenstunden heute** / **morgen** | Anzahl Spitzenstunden am jeweiligen Tag (Ortszeit) |
 | Kalender **Spitzenzeiten** | Alle prognostizierten Spitzenblöcke als Termine |
 

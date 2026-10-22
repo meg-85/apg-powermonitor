@@ -16,6 +16,8 @@ PEAK_HOUR_URL = "https://awareness.cloud.apg.at/api/v1/PeakHourStatus"
 HOUR = timedelta(hours=1)
 REQUEST_TIMEOUT = 20
 
+OFF_PEAK_LOOKAHEAD = timedelta(hours=24)
+
 
 class ApgApiError(Exception):
     """The API could not be reached or returned unusable data."""
@@ -27,6 +29,18 @@ class PeakPeriod:
 
     start: datetime
     end: datetime
+
+
+@dataclass(frozen=True)
+class OffPeakWindow:
+    """A block of consecutive non-peak hours. `end` is exclusive."""
+
+    start: datetime
+    end: datetime
+
+    @property
+    def duration(self) -> timedelta:
+        return self.end - self.start
 
 
 @dataclass(frozen=True)
@@ -42,6 +56,7 @@ class PeakHourData:
     default_status: str
     statuses: dict[datetime, str]
     periods: tuple[PeakPeriod, ...]
+    windows: tuple[OffPeakWindow, ...] = ()
 
     def has_data_for(self, when: datetime) -> bool:
         """Return True if the forecast covers this point in time."""
@@ -64,6 +79,17 @@ class PeakHourData:
     def next_period(self, when: datetime) -> PeakPeriod | None:
         """Return the first period that starts after `when`."""
         return next((p for p in self.periods if p.start > when), None)
+
+    def current_or_next_window(self, when: datetime) -> OffPeakWindow | None:
+        """Return the off-peak window running at `when`, else the next one.
+
+        Windows that start more than OFF_PEAK_LOOKAHEAD after `when` are
+        ignored, so the result is None during long peak stretches.
+        """
+        window = next((w for w in self.windows if w.end > when), None)
+        if window is None or window.start > when + OFF_PEAK_LOOKAHEAD:
+            return None
+        return window
 
     def peak_hours_between(self, start: datetime, end: datetime) -> int | None:
         """Count peak hours in [start, end), or None if not fully covered."""
@@ -110,7 +136,27 @@ def parse_peak_hour_status(payload: dict[str, Any]) -> PeakHourData:
         default_status=default_status,
         statuses=statuses,
         periods=tuple(periods),
+        windows=_off_peak_windows(first_utc, last_utc + HOUR, periods),
     )
+
+
+def _off_peak_windows(
+    start: datetime, end: datetime, periods: list[PeakPeriod]
+) -> tuple[OffPeakWindow, ...]:
+    """Return the gaps between peak periods within the forecast range.
+
+    A window touching the forecast end is cut off there; its real end is
+    unknown until the next forecast is published.
+    """
+    windows: list[OffPeakWindow] = []
+    cursor = start
+    for period in periods:
+        if period.start > cursor:
+            windows.append(OffPeakWindow(cursor, period.start))
+        cursor = max(cursor, period.end)
+    if cursor < end:
+        windows.append(OffPeakWindow(cursor, end))
+    return tuple(windows)
 
 
 class ApgClient:

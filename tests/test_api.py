@@ -1,6 +1,6 @@
 """Tests for the HA-independent API parsing logic."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import importlib.util
 import json
 from pathlib import Path
@@ -63,3 +63,28 @@ def test_peak_hours_between():
     assert data.peak_hours_between(utc(2026, 10, 14, 22), utc(2026, 10, 15, 22)) == 20
     # Partially outside the forecast -> unknown
     assert data.peak_hours_between(utc(2026, 10, 18, 22), utc(2026, 10, 19, 22)) is None
+
+
+def test_off_peak_windows():
+    data = api.parse_peak_hour_status(PAYLOAD)
+    first = data.windows[0]
+    assert first.start == utc(2026, 10, 15, 9)   # Thu 11:00 Vienna
+    assert first.end == utc(2026, 10, 15, 13)    # Thu 15:00 Vienna
+    assert first.duration == timedelta(hours=4)
+    # Peak until the forecast end -> no trailing window
+    assert data.windows[-1].end <= data.last_utc
+
+
+def test_current_or_next_window():
+    data = api.parse_peak_hour_status(PAYLOAD)
+    # In a peak, window starts in 19 h -> reported
+    upcoming = data.current_or_next_window(utc(2026, 10, 14, 14))
+    assert (upcoming.start, upcoming.end) == (utc(2026, 10, 15, 9), utc(2026, 10, 15, 13))
+    # Inside the window -> same window, not the next one
+    running = data.current_or_next_window(utc(2026, 10, 15, 10, 30))
+    assert running.start == utc(2026, 10, 15, 9)
+    # Short 1 h gap on Sunday evening
+    short = data.current_or_next_window(utc(2026, 10, 18, 18, 30))
+    assert short.duration == timedelta(hours=1)
+    # Next window more than 24 h ahead -> not reported
+    assert data.current_or_next_window(utc(2026, 10, 13, 22)) is None

@@ -1,7 +1,9 @@
 {
   "domain": "apg_powermonitor",
   "name": "APG Powermonitor",
-  "codeowners": ["@meg-85"],
+  "codeowners": [
+    "@meg-85"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/meg-85/apg-powermonitor",
   "integration_type": "service",
@@ -9,5 +11,5 @@
   "issue_tracker": "https://github.com/meg-85/apg-powermonitor/issues",
   "requirements": [],
   "single_config_entry": true,
-  "version": "0.1.0"
+  "version": "0.2.0"
 }
