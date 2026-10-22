@@ -88,3 +88,21 @@ def test_current_or_next_window():
     assert short.duration == timedelta(hours=1)
     # Next window more than 24 h ahead -> not reported
     assert data.current_or_next_window(utc(2026, 10, 13, 22)) is None
+
+
+def test_split_at_local_midnight():
+    from zoneinfo import ZoneInfo
+
+    vienna = ZoneInfo("Europe/Vienna")
+    # Thu 17:00 -> Fri 11:00 (CEST) becomes two pieces
+    pieces = api.split_at_local_midnight(utc(2026, 10, 22, 15), utc(2026, 10, 23, 9), vienna)
+    assert [(s.hour, e.hour) for s, e in pieces] == [(17, 0), (0, 11)]
+    assert pieces[0][1] == pieces[1][0]
+    # Within one day -> unchanged
+    assert len(api.split_at_local_midnight(utc(2026, 10, 23, 20), utc(2026, 10, 23, 21), vienna)) == 1
+    # Across the DST change (Sat 16:00 CEST -> Sun 03:00 CET): midnight is still 00:00 local
+    pieces = api.split_at_local_midnight(utc(2026, 10, 24, 14), utc(2026, 10, 25, 2), vienna)
+    assert pieces[0][1] == datetime(2026, 10, 25, tzinfo=vienna)
+    assert pieces[1][1] == utc(2026, 10, 25, 2)
+    # 00:00-03:00 local is 4 real hours (repeated hour); compare in UTC, not wall time
+    assert pieces[1][1].astimezone(timezone.utc) - pieces[1][0].astimezone(timezone.utc) == timedelta(hours=4)
