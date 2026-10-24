@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo
 from typing import Any
 
 import aiohttp
@@ -100,6 +100,27 @@ class PeakHourData:
             for hour, status in self.statuses.items()
             if start <= hour < end and status != self.default_status
         )
+
+
+def split_at_local_midnight(
+    start: datetime, end: datetime, tz: tzinfo
+) -> list[tuple[datetime, datetime]]:
+    """Split [start, end) into pieces that each stay within one local day.
+
+    Calendar views draw events spanning midnight as bars across several
+    days, which stack on top of each other. One piece per day avoids that.
+    Midnight is computed per day, so DST changes are handled.
+    """
+    pieces: list[tuple[datetime, datetime]] = []
+    cursor = start.astimezone(tz)
+    end = end.astimezone(tz)
+    while cursor < end:
+        next_day = cursor.date() + timedelta(days=1)
+        midnight = datetime(next_day.year, next_day.month, next_day.day, tzinfo=tz)
+        piece_end = min(end, midnight)
+        pieces.append((cursor, piece_end))
+        cursor = piece_end
+    return pieces
 
 
 def _parse_utc(value: str) -> datetime:
