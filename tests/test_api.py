@@ -106,3 +106,30 @@ def test_split_at_local_midnight():
     assert pieces[1][1] == utc(2026, 10, 25, 2)
     # 00:00-03:00 local is 4 real hours (repeated hour); compare in UTC, not wall time
     assert pieces[1][1].astimezone(timezone.utc) - pieces[1][0].astimezone(timezone.utc) == timedelta(hours=4)
+
+
+def test_decode_payload_plain_object():
+    body = json.dumps(PAYLOAD)
+    assert api.decode_payload(body)["DefaultStatus"] == "1"
+
+
+def test_decode_payload_double_encoded():
+    # The API sometimes returns the object as a JSON string
+    body = json.dumps(json.dumps(PAYLOAD))
+    data = api.parse_peak_hour_status(api.decode_payload(body))
+    assert data.first_utc == utc(2026, 10, 13, 22)
+
+
+def test_decode_payload_text_message():
+    import pytest
+
+    for body in ['"Service temporarily unavailable"', "<html>Bad Gateway</html>", "", "[]"]:
+        with pytest.raises(api.ApgApiError, match="Unexpected response"):
+            api.decode_payload(body)
+
+
+def test_parse_rejects_non_dict():
+    import pytest
+
+    with pytest.raises(api.ApgApiError):
+        api.parse_peak_hour_status("just a string")
