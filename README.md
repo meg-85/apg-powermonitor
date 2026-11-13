@@ -15,7 +15,7 @@ Spitzenzeiten sind Stunden, in denen die Residuallast (Verbrauch minus Einspeisu
 | Sensor **Spitzenstunden heute** / **morgen** | Anzahl Spitzenstunden am jeweiligen Tag (Ortszeit) |
 | Kalender **Spitzenzeiten** | Alle prognostizierten Spitzenblöcke als Termine |
 
-Die API wird stündlich abgefragt; der Spitzenzeit-Status wird zusätzlich zu jeder vollen Stunde neu berechnet.
+Die API wird stündlich abgefragt; der Spitzenzeit-Status wird zusätzlich zu jeder vollen Stunde neu berechnet. Schlägt ein Abruf fehl, bleibt die letzte gültige Prognose (höchstens 24 h alt) aktiv und es wird alle 10 Minuten erneut versucht – die Entitäten werden dabei nicht `nicht verfügbar`.
 
 ## Installation (HACS)
 

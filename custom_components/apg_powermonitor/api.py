@@ -6,6 +6,7 @@ This module has no Home Assistant imports so it can be tested on its own.
 from __future__ import annotations
 
 import asyncio
+import json
 from dataclasses import dataclass
 from datetime import datetime, timedelta, tzinfo
 from typing import Any
@@ -131,8 +132,28 @@ def _floor_hour(when: datetime) -> datetime:
     return when.replace(minute=0, second=0, microsecond=0)
 
 
+def decode_payload(body: str) -> dict[str, Any]:
+    """Decode the response body into the expected JSON object.
+
+    The API occasionally answers with a JSON string instead of an object:
+    either the real data encoded a second time, or a plain text message.
+    The first case is unwrapped; everything else raises ApgApiError with the
+    start of the body, so the log shows what actually came back.
+    """
+    try:
+        payload: Any = json.loads(body)
+        if isinstance(payload, str):
+            payload = json.loads(payload)
+    except ValueError:
+        payload = None
+    if not isinstance(payload, dict):
+        snippet = " ".join(body.split())[:200]
+        raise ApgApiError(f"Unexpected response from APG API: {snippet!r}")
+    return payload
+
+
 def parse_peak_hour_status(payload: dict[str, Any]) -> PeakHourData:
-    """Turn the raw JSON payload into PeakHourData."""
+    """Turn the decoded JSON object into PeakHourData."""
     try:
         default_status = str(payload["DefaultStatus"])
         first_utc = _parse_utc(payload["FirstUtc"])
@@ -194,7 +215,7 @@ class ApgClient:
                     PEAK_HOUR_URL, headers={"Accept": "application/json"}
                 )
                 response.raise_for_status()
-                payload = await response.json(content_type=None)
+                body = await response.text()
         except (aiohttp.ClientError, TimeoutError) as err:
             raise ApgApiError(f"Error talking to APG API: {err}") from err
-        return parse_peak_hour_status(payload)
+        return parse_peak_hour_status(decode_payload(body))

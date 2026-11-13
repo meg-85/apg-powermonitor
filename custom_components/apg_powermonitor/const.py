@@ -9,6 +9,11 @@ LOGGER = logging.getLogger(__package__)
 # The forecast is published once a day (around 09:30); hourly polling is plenty.
 UPDATE_INTERVAL = timedelta(hours=1)
 
+# After a failed fetch: retry sooner, and keep serving the last good forecast
+# for at most this long (it covers several days, but is renewed daily).
+RETRY_INTERVAL = timedelta(minutes=10)
+MAX_DATA_AGE = timedelta(hours=24)
+
 # Notice requested by APG for users of the public API.
 ATTRIBUTION = (
     "Mehr zum Thema sichere Stromversorgung & Zahlen, Daten, Fakten zur Welt "
